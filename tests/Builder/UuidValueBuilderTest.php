@@ -10,6 +10,8 @@ use Yiisoft\Db\Oracle\Builder\UuidValueBuilder;
 use Yiisoft\Db\Oracle\Tests\Support\IntegrationTestTrait;
 use Yiisoft\Db\Tests\Support\IntegrationTestCase;
 
+use function strtolower;
+
 /**
  * @group oracle
  */
@@ -40,11 +42,11 @@ final class UuidValueBuilderTest extends IntegrationTestCase
 
         $db->createCommand()->insert('uuid_value', ['id' => new UuidValue(self::UUID)])->execute();
 
-        // Oracle returns a `raw` column as 16 raw bytes on some versions and as 32 hexadecimal characters on others,
-        // and `DbUuidHelper::toUuid()` accepts both.
+        // Depending on the Oracle version a `raw` column reads back as 16 raw bytes or as 32 hexadecimal characters,
+        // uppercase in the latter case. `DbUuidHelper::toUuid()` accepts both but keeps the case it was given.
         $stored = $db->createCommand('SELECT [[id]] FROM [[uuid_value]]')->queryScalar();
 
-        $this->assertSame(self::UUID, DbUuidHelper::toUuid($stored));
+        $this->assertSame(self::UUID, strtolower(DbUuidHelper::toUuid($stored)));
 
         $this->dropTable('uuid_value');
     }
