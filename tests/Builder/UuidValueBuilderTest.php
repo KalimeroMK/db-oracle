@@ -46,6 +46,7 @@ final class UuidValueBuilderTest extends IntegrationTestCase
         // uppercase in the latter case. `DbUuidHelper::toUuid()` accepts both but keeps the case it was given.
         $stored = $db->createCommand('SELECT [[id]] FROM [[uuid_value]]')->queryScalar();
 
+        $this->assertIsString($stored);
         $this->assertSame(self::UUID, strtolower(DbUuidHelper::toUuid($stored)));
 
         $this->dropTable('uuid_value');
