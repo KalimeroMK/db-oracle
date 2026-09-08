@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Oracle\Tests\Builder;
 
-use Yiisoft\Db\Constant\DataType;
-use Yiisoft\Db\Expression\Value\Param;
 use Yiisoft\Db\Expression\Value\UuidValue;
 use Yiisoft\Db\Helper\DbUuidHelper;
 use Yiisoft\Db\Oracle\Builder\UuidValueBuilder;
@@ -23,7 +21,7 @@ final class UuidValueBuilderTest extends IntegrationTestCase
 
     private const UUID = '738146be-87b1-49f2-9913-36142fb6fcbe';
 
-    public function testBuildBindsRawBytesAsLob(): void
+    public function testBuildEmitsHexToRawLiteral(): void
     {
         $db = $this->getSharedConnection();
         $builder = new UuidValueBuilder($db->getQueryBuilder());
@@ -31,11 +29,8 @@ final class UuidValueBuilderTest extends IntegrationTestCase
         $params = [];
         $result = $builder->build(new UuidValue(self::UUID), $params);
 
-        $this->assertSame(':qp0', $result);
-        $this->assertEquals(
-            [':qp0' => new Param(DbUuidHelper::uuidToBlob(self::UUID), DataType::LOB)],
-            $params,
-        );
+        $this->assertSame("HEXTORAW('738146be87b149f2991336142fb6fcbe')", $result);
+        $this->assertSame([], $params);
     }
 
     public function testInsertAndSelectUuid(): void
