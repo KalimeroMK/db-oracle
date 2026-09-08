@@ -10,8 +10,6 @@ use Yiisoft\Db\Oracle\Builder\UuidValueBuilder;
 use Yiisoft\Db\Oracle\Tests\Support\IntegrationTestTrait;
 use Yiisoft\Db\Tests\Support\IntegrationTestCase;
 
-use function strlen;
-
 /**
  * @group oracle
  */
@@ -42,10 +40,11 @@ final class UuidValueBuilderTest extends IntegrationTestCase
 
         $db->createCommand()->insert('uuid_value', ['id' => new UuidValue(self::UUID)])->execute();
 
-        $bytes = $db->createCommand('SELECT [[id]] FROM [[uuid_value]]')->queryScalar();
+        // Oracle returns a `raw` column as 16 raw bytes on some versions and as 32 hexadecimal characters on others,
+        // and `DbUuidHelper::toUuid()` accepts both.
+        $stored = $db->createCommand('SELECT [[id]] FROM [[uuid_value]]')->queryScalar();
 
-        $this->assertSame(16, strlen($bytes));
-        $this->assertSame(self::UUID, DbUuidHelper::toUuid($bytes));
+        $this->assertSame(self::UUID, DbUuidHelper::toUuid($stored));
 
         $this->dropTable('uuid_value');
     }
