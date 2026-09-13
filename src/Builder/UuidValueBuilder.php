@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Db\Oracle\Builder;
 
+use Yiisoft\Db\Expression\ExpressionBuilderInterface;
 use Yiisoft\Db\Expression\ExpressionInterface;
-use Yiisoft\Db\Expression\Value\Builder\UuidValueBuilder as BaseUuidValueBuilder;
 use Yiisoft\Db\Expression\Value\UuidValue;
 
 use function str_replace;
@@ -19,8 +19,10 @@ use function str_replace;
  *
  * Inlining is safe here because `UuidValue` normalizes the value to the canonical form, which leaves exactly 32
  * hexadecimal characters once the dashes are removed.
+ *
+ * @implements ExpressionBuilderInterface<UuidValue>
  */
-final class UuidValueBuilder extends BaseUuidValueBuilder
+final class UuidValueBuilder implements ExpressionBuilderInterface
 {
     public function build(ExpressionInterface $expression, array &$params = []): string
     {

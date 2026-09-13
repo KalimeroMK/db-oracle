@@ -43,8 +43,7 @@ final class UuidValueBuilderTest extends IntegrationTestCase
     #[DataProvider('values')]
     public function testBuildEmitsHexToRawLiteral(string $value): void
     {
-        $db = $this->getSharedConnection();
-        $builder = new UuidValueBuilder($db->getQueryBuilder());
+        $builder = new UuidValueBuilder();
 
         $params = [];
         $result = $builder->build(new UuidValue($value), $params);
